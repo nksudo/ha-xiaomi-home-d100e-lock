@@ -1,0 +1,37 @@
+--- a/custom_components/xiaomi_home/miot/miot_device.py
++++ b/custom_components/xiaomi_home/miot/miot_device.py
+@@ -1234,7 +1234,10 @@
+             for item in params['arguments']:
+                 for prop in event.argument:
+                     if prop.iid == item['piid']:
+-                        trans_arg[prop.description_trans] = item['value']
++                        key = prop.description_trans
++                        if key in trans_arg:
++                            key = f'{key}_{prop.iid}'
++                        trans_arg[key] = item['value']
+                         break
+             self._event_occurred_handler(event, trans_arg)
+             break
+@@ -1464,7 +1467,12 @@
+ 
+         self._arguments_map = {}
+         for prop in spec.argument:
+-            self._arguments_map[prop.iid] = prop.description_trans
++            name = prop.description_trans
++            if name in self._arguments_map.values():
++                # Equal (e.g. untranslated "NA") names would overwrite each
++                # other in the event attributes and lose data.
++                name = f'{name}_{prop.iid}'
++            self._arguments_map[prop.iid] = name
+         self._state_sub_id = 0
+         self._value_sub_id = 0
+ 
+@@ -1516,7 +1524,7 @@
+                 ):
+                     # Dirty fix for cloud multi-arguments
+                     trans_arg = {
+-                        prop.description_trans: item['value'][index]
++                        self._arguments_map[prop.iid]: item['value'][index]
+                         for index, prop in enumerate(self.spec.argument)
+                     }
+                     break

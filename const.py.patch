@@ -1,0 +1,10 @@
+--- a/custom_components/xiaomi_home/miot/const.py
++++ b/custom_components/xiaomi_home/miot/const.py
+@@ -84,6 +84,7 @@
+     'fan',
+     'humidifier',
+     'light',
++    'lock',
+     'media_player',
+     'notify',
+     'number',
